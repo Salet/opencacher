@@ -1,17 +1,17 @@
-import { GeoPoint } from "../interfaces/geolocation";
+import { Geopoint } from "../interfaces/geolocation";
 
 export function calculateGeoPointMeterDistance(
-  a: GeoPoint,
-  b: GeoPoint
+  a: Geopoint,
+  b: Geopoint
 ): number {
-  let latitudeDistance = (b.lat * Math.PI) / 180 - (a.lat * Math.PI) / 180;
-  let longitudeDistance = (b.lon * Math.PI) / 180 - (a.lon * Math.PI) / 180;
+  let latitudeDistance = (b.latitude * Math.PI) / 180 - (a.latitude * Math.PI) / 180;
+  let longitudeDistance = (b.longitude * Math.PI) / 180 - (a.longitude * Math.PI) / 180;
   let haversine =
     Math.sin(latitudeDistance / 2) * Math.sin(latitudeDistance / 2) +
-    Math.cos((a.lat * Math.PI) / 180) *
-      Math.cos((b.lat * Math.PI) / 180) *
-      Math.sin(longitudeDistance / 2) *
-      Math.sin(longitudeDistance / 2);
+    Math.cos((a.latitude * Math.PI) / 180) *
+    Math.cos((b.latitude * Math.PI) / 180) *
+    Math.sin(longitudeDistance / 2) *
+    Math.sin(longitudeDistance / 2);
   return (
     6378.137 *
     2 *

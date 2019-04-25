@@ -1,6 +1,7 @@
 import { API_URL, CONSUMER_KEY } from "./constants";
+import { Geopoint } from '../interfaces/geolocation';
 
-interface CachesDetailsResponse {
+export interface CachesDetailsResponse {
   [code: string]: {
     code: string;
     name: string;
@@ -10,16 +11,16 @@ interface CachesDetailsResponse {
   };
 }
 
-interface CachesNearestResponse {
+export interface CachesNearestResponse {
   results: Array<string>;
 }
 
 export default class CachesService {
-  fetchCachesNearest(position: Position): Promise<CachesNearestResponse> {
+  fetchCachesNearest(geopoint: Geopoint): Promise<CachesNearestResponse> {
     const ENDPOINT = "services/caches/search/nearest";
     const URL = `${API_URL}${ENDPOINT}${CONSUMER_KEY}&center=${
-      position.coords.latitude
-    }|${position.coords.longitude}`;
+      geopoint.latitude
+      }|${geopoint.longitude}`;
     return fetch(URL).then(response => response.json());
   }
 

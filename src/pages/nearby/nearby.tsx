@@ -1,4 +1,12 @@
-import { Component } from "react";
+import React, { Component } from "react";
+import { Geolocation } from '../../interfaces/geolocation';
+import CachesService, { CachesNearestResponse, CachesDetailsResponse } from '../../services/caches';
+import { calculateGeoPointMeterDistance } from '../../helpers/geolocation';
+import './nearby.css';
+
+interface NearbyProps {
+  geolocation: Geolocation;
+}
 
 interface NearbyState {
   nearestCodes: Array<string>;
@@ -12,8 +20,10 @@ interface NearbyState {
   }>;
 }
 
-export default class Nearby extends Component<any, NearbyState> {
-  constructor(props: any, state: any) {
+export default class Nearby extends Component<NearbyProps, NearbyState> {
+  cachesService = new CachesService();
+
+  constructor(props: NearbyProps, state: NearbyState) {
     super(props, state);
     this.state = {
       nearestCodes: [],
@@ -21,66 +31,49 @@ export default class Nearby extends Component<any, NearbyState> {
     };
   }
 
-  // ACTIONS
-  // getNearestCaches(): void {
-  //   navigator.geolocation.getCurrentPosition(
-  //     (position: Position) => {
-  //       this.setState({ currentPosition: position });
-  //       this.handleCurrentPosition.call(this, position);
-  //     },
-  //     _ => {
-  //       this.setState({
-  //         error: "Please allow location services for this browser"
-  //       });
-  //     }
-  //   );
-  // }
-  // handleCurrentPosition(position: Position): void {
-  //   this.fetchCachesNearest(position).then(this.handleCachesNearest.bind(this));
-  // }
+  componentDidUpdate(prevProps: NearbyProps) {
+    if (this.props.geolocation.latitude !== prevProps.geolocation.latitude) {
+      this.cachesService.fetchCachesNearest(this.props.geolocation).then(this.handleCachesNearest.bind(this));
+    }
+  }
 
-  // handleCachesNearest(response: CachesNearestResponse): void {
-  //   this.setState({ nearestCodes: response.results });
-  //   this.fetchCachesDetails(this.state.nearestCodes).then(
-  //     this.handleCachesDetails.bind(this)
-  //   );
-  // }
+  handleCachesNearest(response: CachesNearestResponse): void {
+    this.setState({ nearestCodes: response.results });
+    this.cachesService.fetchCachesDetails(this.state.nearestCodes).then(
+      this.handleCachesDetails.bind(this)
+    );
+  }
 
-  // handleCachesDetails(response: CachesDetailsResponse): void {
-  //   let nearestDetails = [];
-  //   for (let code of this.state.nearestCodes) {
-  //     nearestDetails.push({
-  //       distance: calculateGeoPointMeterDistance(
-  //         {
-  //           lat: this.state.currentPosition!.coords.latitude,
-  //           lon: this.state.currentPosition!.coords.longitude
-  //         },
-  //         {
-  //           lat: +response[code].location.split("|")[0],
-  //           lon: +response[code].location.split("|")[1]
-  //         }
-  //       ),
-  //       ...response[code]
-  //     });
-  //   }
-  //   this.setState({ nearestDetails: nearestDetails });
-  // }
+  handleCachesDetails(response: CachesDetailsResponse): void {
+    let nearestDetails = [];
+    for (let code of this.state.nearestCodes) {
+      nearestDetails.push({
+        distance: calculateGeoPointMeterDistance(
+          {
+            latitude: this.props.geolocation.latitude,
+            longitude: this.props.geolocation.longitude
+          },
+          {
+            latitude: +response[code].location.split("|")[0],
+            longitude: +response[code].location.split("|")[1]
+          }
+        ),
+        ...response[code]
+      });
+    }
+    this.setState({ nearestDetails: nearestDetails });
+  }
 
   renderCache(cache: any) {
-    let nameStyle = {
-      margin: 0
-    };
     return (
-      <div>
-        <div className="container" style={{ padding: "10px" }}>
-          <h3 style={nameStyle}>{cache.name}</h3>
-          <p>
-            Dystans: {Math.round(cache.distance)}m | Typ: {cache.type} | Ocena:{" "}
-            {cache.rating} | Rozmiar: {cache.size2} | Teren: {cache.terrain} |
-            Rekomendacje: {cache.recommendations}
-          </p>
-        </div>
-        <hr style={{ border: 0, borderBottom: "1px solid #eee" }} />
+      <div className="Nearby-cache">
+        <h3>{cache.name}</h3>
+        <p>
+          Dystans: {Math.round(cache.distance)}m | Typ: {cache.type} | Ocena:{" "}
+          {cache.rating} | Rozmiar: {cache.size2} | Teren: {cache.terrain} |
+          Rekomendacje: {cache.recommendations}
+        </p>
+        <hr className="Nearby-separator" />
       </div>
     );
   }
