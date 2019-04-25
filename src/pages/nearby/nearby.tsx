@@ -29,6 +29,7 @@ export default class Nearby extends Component<NearbyProps, NearbyState> {
       nearestCodes: [],
       nearestDetails: []
     };
+    this.cachesService.fetchCachesNearest(this.props.geolocation).then(this.handleCachesNearest.bind(this));
   }
 
   componentDidUpdate(prevProps: NearbyProps) {
