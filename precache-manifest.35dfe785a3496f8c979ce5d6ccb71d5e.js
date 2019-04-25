@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "a8cc3d08ccab4071b779",
+    "revision": "d6d4a31922e0c03ee08d",
     "url": "/opencacher/static/css/main.17e81a6c.chunk.css"
   },
   {
-    "revision": "a8cc3d08ccab4071b779",
-    "url": "/opencacher/static/js/main.59cd6e4d.chunk.js"
+    "revision": "d6d4a31922e0c03ee08d",
+    "url": "/opencacher/static/js/main.709b0906.chunk.js"
   },
   {
     "revision": "3c6c093335a3cbd031c3",
@@ -16,7 +16,7 @@ self.__precacheManifest = [
     "url": "/opencacher/static/js/2.4e81ba5b.chunk.js"
   },
   {
-    "revision": "5e06432a12c451f7fa9c5f9b1619fc0e",
+    "revision": "a88b8fd56f9605b98df4b283e5f28dec",
     "url": "/opencacher/index.html"
   }
 ];
