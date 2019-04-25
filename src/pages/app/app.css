@@ -1,0 +1,10 @@
+.App {
+  margin: 0 auto;
+  max-width: 1100px;
+}
+
+.container {
+  max-width: 1100px;
+  padding-left: 10px;
+  padding-right: 10px;
+}

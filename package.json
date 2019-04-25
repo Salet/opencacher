@@ -16,6 +16,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "local": "HTTPS=true npm start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "deploy": "react-scripts build && gh-pages -d build",
