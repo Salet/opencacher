@@ -51,6 +51,8 @@ class App extends Component<any, AppState> {
     navigator.geolocation.getCurrentPosition((position: Position) => {
       this.setState({ currentPosition: position });
       this.handleCurrentPosition.call(this, position);
+    }, _ => {
+      this.setState({ error: "Please allow location services for this browser" });
     });
   }
 
@@ -142,6 +144,7 @@ class App extends Component<any, AppState> {
 
     return (
       <div style={appStyle}>
+        { this.state.error }
         { this.state.nearestDetails.map(cache => this.renderCache(cache)) }
       </div>
     );
