@@ -1,13 +1,13 @@
 {
-  "main.css": "/static/css/main.861d17de.chunk.css",
-  "main.js": "/static/js/main.94d5cf81.chunk.js",
-  "main.js.map": "/static/js/main.94d5cf81.chunk.js.map",
-  "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
-  "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
-  "static/js/2.f9075ab4.chunk.js": "/static/js/2.f9075ab4.chunk.js",
-  "static/js/2.f9075ab4.chunk.js.map": "/static/js/2.f9075ab4.chunk.js.map",
-  "index.html": "/index.html",
-  "precache-manifest.27cd56497c6befef780cc0c374d9567b.js": "/precache-manifest.27cd56497c6befef780cc0c374d9567b.js",
-  "service-worker.js": "/service-worker.js",
-  "static/css/main.861d17de.chunk.css.map": "/static/css/main.861d17de.chunk.css.map"
+  "main.css": "/opencacher/static/css/main.861d17de.chunk.css",
+  "main.js": "/opencacher/static/js/main.dd6f4028.chunk.js",
+  "main.js.map": "/opencacher/static/js/main.dd6f4028.chunk.js.map",
+  "runtime~main.js": "/opencacher/static/js/runtime~main.e4d53384.js",
+  "runtime~main.js.map": "/opencacher/static/js/runtime~main.e4d53384.js.map",
+  "static/js/2.f9075ab4.chunk.js": "/opencacher/static/js/2.f9075ab4.chunk.js",
+  "static/js/2.f9075ab4.chunk.js.map": "/opencacher/static/js/2.f9075ab4.chunk.js.map",
+  "index.html": "/opencacher/index.html",
+  "precache-manifest.9a0f3337a61974a51cca299fc7704e23.js": "/opencacher/precache-manifest.9a0f3337a61974a51cca299fc7704e23.js",
+  "service-worker.js": "/opencacher/service-worker.js",
+  "static/css/main.861d17de.chunk.css.map": "/opencacher/static/css/main.861d17de.chunk.css.map"
 }
