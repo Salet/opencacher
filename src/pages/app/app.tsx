@@ -60,9 +60,10 @@ export default class App extends Component<any, AppState> {
     if (!this.state.geolocationEnabled) {
       this.setState({ geolocationEnabled: true });
     }
+    this.setState({ geolocation: position });
   }
 
-  handlePositionError(error: any) {
+  handlePositionError() {
     this.setState({ geolocationEnabled: false });
   }
 
