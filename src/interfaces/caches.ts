@@ -15,3 +15,20 @@ export interface CacheDetails {
 export interface CacheDetailsWithDistance extends CacheDetails {
   distance: number;
 }
+
+export interface CacheLog {
+  uuid: string;
+  date: string;
+  type: string;
+  comment: string;
+  user: {
+    uuid: string;
+    username: string;
+    profile_url: string;
+  };
+}
+
+export interface CacheDetailsExtended extends CacheDetailsWithDistance {
+  description: string;
+  latest_logs: Array<CacheLog>;
+}

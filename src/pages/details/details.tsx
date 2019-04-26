@@ -1,12 +1,17 @@
 import React, { Component } from "react";
-import { CacheDetailsWithDistance } from "../../interfaces/caches";
+import {
+  CacheDetailsWithDistance,
+  CacheDetailsExtended,
+  CacheLog
+} from "../../interfaces/caches";
+import CachesService from "../../services/caches";
 
 interface DetailsProps {
-  cache: CacheDetailsWithDistance | null;
+  cache: CacheDetailsWithDistance;
 }
 
 interface DetailsState {
-  cache: CacheDetailsWithDistance;
+  cache: CacheDetailsExtended;
 }
 
 const EMPTY_CACHE = {
@@ -20,10 +25,14 @@ const EMPTY_CACHE = {
   difficulty: 0,
   terrain: 0,
   rating: 0,
-  recommendations: 0
+  recommendations: 0,
+  description: "",
+  latest_logs: []
 };
 
 export default class Details extends Component<DetailsProps, DetailsState> {
+  cachesService = new CachesService();
+
   constructor(props: DetailsProps) {
     super(props);
     this.state = {
@@ -32,7 +41,29 @@ export default class Details extends Component<DetailsProps, DetailsState> {
   }
 
   componentWillMount() {
-    this.setState({ cache: this.props.cache || EMPTY_CACHE });
+    this.setState({ cache: { ...EMPTY_CACHE, ...this.props.cache } });
+    this.cachesService
+      .fetchCacheDetails(this.props.cache.code)
+      .then(response => {
+        let extendedCache: CacheDetailsExtended = {
+          ...this.state.cache,
+          ...response
+        };
+        this.setState({ cache: extendedCache });
+      });
+  }
+
+  renderLog(log: CacheLog) {
+    let logDate = new Date(log.date);
+    return (
+      <div>
+        <b>
+          {log.user.username} - {log.type} - {logDate.toLocaleString()}
+        </b>
+        <p dangerouslySetInnerHTML={{ __html: log.comment }} />
+        <hr />
+      </div>
+    );
   }
 
   render() {
@@ -52,6 +83,18 @@ export default class Details extends Component<DetailsProps, DetailsState> {
         <p>Rozmiar: {this.state.cache.size2}</p>
         <p>Trudność: {this.state.cache.difficulty}/5</p>
         <p>Teren: {this.state.cache.terrain}/5</p>
+        <br />
+        <hr />
+        <hr />
+        <br />
+        <div
+          dangerouslySetInnerHTML={{ __html: this.state.cache.description }}
+        />
+        <br />
+        <hr />
+        <hr />
+        <br />
+        {this.state.cache.latest_logs.map(this.renderLog)}
       </div>
     );
   }

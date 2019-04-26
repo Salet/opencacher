@@ -174,7 +174,7 @@ export default class App extends Component<any, AppState> {
             onCacheClick={this.handleCacheClick.bind(this)}
           />
         )}
-        {this.state.page == "details" && (
+        {this.state.page == "details" && this.state.currentCache && (
           <Details cache={this.state.currentCache} />
         )}
       </div>

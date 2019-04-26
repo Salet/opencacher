@@ -26,4 +26,10 @@ export default class CachesService {
     )}&fields=code|name|location|type|status|size2|difficulty|terrain|rating|recommendations`;
     return fetch(URL).then(response => response.json());
   }
+
+  fetchCacheDetails(code: string): Promise<any> {
+    const ENDPOINT = "services/caches/geocache";
+    const URL = `${API_URL}${ENDPOINT}${CONSUMER_KEY}&cache_code=${code}&fields=description|latest_logs`;
+    return fetch(URL).then(response => response.json());
+  }
 }

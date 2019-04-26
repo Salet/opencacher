@@ -50,19 +50,22 @@ export default class Nearby extends Component<NearbyProps, NearbyState> {
   handleCachesDetails(response: CachesDetailsResponse): void {
     let nearestDetails = [];
     for (let code of this.state.nearestCodes) {
+      if (!response[code]) {
+        continue;
+      }
       nearestDetails.push({
-        distance: response[code].location
+        distance: !!response[code].location
           ? calculateGeoPointMeterDistance(
               {
                 latitude: this.props.geolocation.latitude,
                 longitude: this.props.geolocation.longitude
               },
               {
-                latitude: +response[code].location.split("|")[0] | 0,
-                longitude: +response[code].location.split("|")[1] | 0
+                latitude: +response[code].location.split("|")[0],
+                longitude: +response[code].location.split("|")[1]
               }
             )
-          : 100000,
+          : 0,
         ...(response[code] as CacheDetailsWithDistance)
       });
     }
@@ -73,6 +76,7 @@ export default class Nearby extends Component<NearbyProps, NearbyState> {
     return (
       <div
         className="Nearby-cache"
+        key={cache.code}
         onClick={() => {
           this.props.onCacheClick(cache);
         }}
