@@ -67,7 +67,7 @@ export default class App extends Component<any, AppState> {
     if (this.state.geolocationObject) {
       navigator.geolocation.getCurrentPosition(
         this.handlePositionEvent.bind(this),
-        () => {},
+        () => { },
         { enableHighAccuracy: true }
       );
     }
@@ -169,11 +169,19 @@ export default class App extends Component<any, AppState> {
         )}
 
         {this.state.page == "nearby" && (
-          <Nearby
-            geolocation={this.state.geolocation}
-            onCacheClick={this.handleCacheClick.bind(this)}
-          />
+          this.state.geolocationReliable && (
+            <Nearby
+              geolocation={this.state.geolocation}
+              onCacheClick={this.handleCacheClick.bind(this)}
+            />) ||
+          !this.state.geolocationEnabled && (
+            <p>Please enable geolocation permission for your browser and this page to see nearby caches.</p>
+          ) ||
+          !this.state.geolocationObject && (
+            <p>Device not supported :(</p>
+          )
         )}
+
         {this.state.page == "details" && this.state.currentCache && (
           <Details cache={this.state.currentCache} />
         )}

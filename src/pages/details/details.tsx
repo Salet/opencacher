@@ -56,7 +56,7 @@ export default class Details extends Component<DetailsProps, DetailsState> {
   renderLog(log: CacheLog) {
     let logDate = new Date(log.date);
     return (
-      <div>
+      <div key={log.uuid}>
         <b>
           {log.user.username} - {log.type} - {logDate.toLocaleString()}
         </b>

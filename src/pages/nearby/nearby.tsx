@@ -56,15 +56,15 @@ export default class Nearby extends Component<NearbyProps, NearbyState> {
       nearestDetails.push({
         distance: !!response[code].location
           ? calculateGeoPointMeterDistance(
-              {
-                latitude: this.props.geolocation.latitude,
-                longitude: this.props.geolocation.longitude
-              },
-              {
-                latitude: +response[code].location.split("|")[0],
-                longitude: +response[code].location.split("|")[1]
-              }
-            )
+            {
+              latitude: this.props.geolocation.latitude,
+              longitude: this.props.geolocation.longitude
+            },
+            {
+              latitude: +response[code].location.split("|")[0],
+              longitude: +response[code].location.split("|")[1]
+            }
+          )
           : 0,
         ...(response[code] as CacheDetailsWithDistance)
       });
@@ -95,6 +95,7 @@ export default class Nearby extends Component<NearbyProps, NearbyState> {
   render() {
     return (
       <div className="Nearby">
+        {!this.state.nearestDetails.length && <p>Loading...</p>}
         {this.state.nearestDetails.map(cache => this.renderCache(cache))}
       </div>
     );
