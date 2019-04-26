@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import "./app.css";
-import Nearby from '../nearby/nearby';
-import { Geolocation } from '../../interfaces/geolocation';
+import Nearby from "../nearby/nearby";
+import Details from "../details/details";
+import { Geolocation } from "../../interfaces/geolocation";
+import { CacheDetailsWithDistance } from "../../interfaces/caches";
 
-type Pages = 'nearby' | 'debug';
+type Pages = "nearby" | "details" | "debug";
 
 interface Orientation {
   absolute: boolean;
@@ -15,6 +17,7 @@ interface Orientation {
 
 interface AppState {
   page: Pages;
+  currentCache: CacheDetailsWithDistance | null;
   geolocationReliable: boolean;
   geolocationObject: boolean;
   geolocationEnabled: boolean;
@@ -26,11 +29,11 @@ interface AppState {
 }
 
 export default class App extends Component<any, AppState> {
-
   constructor(props: any) {
     super(props);
     this.state = {
-      page: 'debug',
+      page: "nearby",
+      currentCache: null,
       geolocationReliable: false,
       geolocationObject: !!navigator.geolocation,
       geolocationEnabled: false,
@@ -54,19 +57,28 @@ export default class App extends Component<any, AppState> {
 
   componentWillMount() {
     window.addEventListener(
-      this.state.orientationAbsoluteEvents ? "deviceorientationabsolute" : "deviceorientation",
+      this.state.orientationAbsoluteEvents
+        ? "deviceorientationabsolute"
+        : "deviceorientation",
       this.handleOrientationEvent.bind(this),
       true
     );
 
     if (this.state.geolocationObject) {
-      navigator.geolocation.getCurrentPosition(this.handlePositionEvent.bind(this), () => { }, { enableHighAccuracy: true });
+      navigator.geolocation.getCurrentPosition(
+        this.handlePositionEvent.bind(this),
+        () => {},
+        { enableHighAccuracy: true }
+      );
     }
   }
 
   handleOrientationEvent(event: any) {
     if (!this.state.orientationReliable) {
-      this.setState({ orientationReliable: !!event.webkitCompassHeading || (event.absolute && !!event.alpha) });
+      this.setState({
+        orientationReliable:
+          !!event.webkitCompassHeading || (event.absolute && !!event.alpha)
+      });
     }
     this.setState({
       orientation: {
@@ -84,15 +96,23 @@ export default class App extends Component<any, AppState> {
       this.setState({ geolocationEnabled: true });
     }
     if (!this.state.geolocationReliable) {
-      this.setState({ geolocationReliable: !!position.coords.latitude || !!position.coords.longitude });
+      this.setState({
+        geolocationReliable:
+          !!position.coords.latitude || !!position.coords.longitude
+      });
     }
     this.setState({
       geolocation: {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
-        accuracy: position.coords.accuracy,
+        accuracy: position.coords.accuracy
       }
     });
+  }
+
+  handleCacheClick(currentCache: CacheDetailsWithDistance) {
+    this.setState({ currentCache });
+    this.setPage("details");
   }
 
   setPage(page: Pages) {
@@ -104,33 +124,59 @@ export default class App extends Component<any, AppState> {
       <div className="App">
         <h1>Opencacher</h1>
         <div className="App-menu">
-          <a href="#" onClick={this.setPage.bind(this, 'nearby')}>Nearby</a> |&nbsp;
-          <a href="#" onClick={this.setPage.bind(this, 'debug')}>Debug info</a>
+          <a href="#" onClick={this.setPage.bind(this, "nearby")}>
+            Nearby
+          </a>{" "}
+          |&nbsp;
+          <a href="#" onClick={this.setPage.bind(this, "debug")}>
+            Debug info
+          </a>
         </div>
 
-        {this.state.page == 'debug' && <div>
-          <p>Geolocation object: {this.state.geolocationObject ? "yes" : "no"}</p>
-          <p>Geolocation enabled: {this.state.geolocationEnabled ? "yes" : "no"}</p>
-          <p>Geolocation reading: {JSON.stringify(this.state.geolocation)}</p>
-          <b>Geolocation reliable: {this.state.geolocationReliable ? "yes" : "no"}</b>
-          <p>-----</p>
-          <p>
-            Orientation relative events:{" "}
-            {this.state.orientationRelativeEvents ? "yes" : "no"}
-          </p>
-          <p>
-            Orientation absolute events:{" "}
-            {this.state.orientationAbsoluteEvents ? "yes" : "no"}
-          </p>
-          <p>
-            Orientation webkit events:{" "}
-            {!!this.state.orientation.webkitCompassHeading ? "yes" : "no"}
-          </p>
-          <p>Orientation reading: {JSON.stringify(this.state.orientation)}</p>
-          <b>Orientation reliable: {this.state.orientationReliable ? "yes" : "no"}</b>
-        </div>}
+        {this.state.page == "debug" && (
+          <div>
+            <p>
+              Geolocation object: {this.state.geolocationObject ? "yes" : "no"}
+            </p>
+            <p>
+              Geolocation enabled:{" "}
+              {this.state.geolocationEnabled ? "yes" : "no"}
+            </p>
+            <p>Geolocation reading: {JSON.stringify(this.state.geolocation)}</p>
+            <b>
+              Geolocation reliable:{" "}
+              {this.state.geolocationReliable ? "yes" : "no"}
+            </b>
+            <p>-----</p>
+            <p>
+              Orientation relative events:{" "}
+              {this.state.orientationRelativeEvents ? "yes" : "no"}
+            </p>
+            <p>
+              Orientation absolute events:{" "}
+              {this.state.orientationAbsoluteEvents ? "yes" : "no"}
+            </p>
+            <p>
+              Orientation webkit events:{" "}
+              {!!this.state.orientation.webkitCompassHeading ? "yes" : "no"}
+            </p>
+            <p>Orientation reading: {JSON.stringify(this.state.orientation)}</p>
+            <b>
+              Orientation reliable:{" "}
+              {this.state.orientationReliable ? "yes" : "no"}
+            </b>
+          </div>
+        )}
 
-        {this.state.page == 'nearby' && <Nearby geolocation={this.state.geolocation}></Nearby>}
+        {this.state.page == "nearby" && (
+          <Nearby
+            geolocation={this.state.geolocation}
+            onCacheClick={this.handleCacheClick.bind(this)}
+          />
+        )}
+        {this.state.page == "details" && (
+          <Details cache={this.state.currentCache} />
+        )}
       </div>
     );
   }

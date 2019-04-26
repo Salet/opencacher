@@ -1,14 +1,9 @@
 import { API_URL, CONSUMER_KEY } from "./constants";
-import { Geopoint } from '../interfaces/geolocation';
+import { Geopoint } from "../interfaces/geolocation";
+import { CacheDetails } from "../interfaces/caches";
 
 export interface CachesDetailsResponse {
-  [code: string]: {
-    code: string;
-    name: string;
-    location: string;
-    status: string;
-    type: string;
-  };
+  [code: string]: CacheDetails;
 }
 
 export interface CachesNearestResponse {
@@ -20,7 +15,7 @@ export default class CachesService {
     const ENDPOINT = "services/caches/search/nearest";
     const URL = `${API_URL}${ENDPOINT}${CONSUMER_KEY}&center=${
       geopoint.latitude
-      }|${geopoint.longitude}`;
+    }|${geopoint.longitude}`;
     return fetch(URL).then(response => response.json());
   }
 
