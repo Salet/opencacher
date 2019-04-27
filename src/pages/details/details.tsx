@@ -5,13 +5,22 @@ import {
   CacheLog
 } from "../../interfaces/caches";
 import CachesService from "../../services/caches";
+import {
+  calculateGeoPointMeterDistance,
+  calculateGeoPointDegreeBearing
+} from "../../helpers/geolocation";
+import { Geolocation } from "../../interfaces/geolocation";
+import "./details.css";
 
 interface DetailsProps {
   cache: CacheDetailsWithDistance;
+  geolocation: Geolocation;
+  phoneHeading: number;
 }
 
 interface DetailsState {
   cache: CacheDetailsExtended;
+  bearing: number;
 }
 
 const EMPTY_CACHE = {
@@ -36,12 +45,25 @@ export default class Details extends Component<DetailsProps, DetailsState> {
   constructor(props: DetailsProps) {
     super(props);
     this.state = {
-      cache: EMPTY_CACHE
+      cache: EMPTY_CACHE,
+      bearing: 0
     };
   }
 
   componentWillMount() {
-    this.setState({ cache: { ...EMPTY_CACHE, ...this.props.cache } });
+    this.setState({
+      cache: { ...EMPTY_CACHE, ...this.props.cache },
+      bearing: calculateGeoPointDegreeBearing(
+        {
+          latitude: this.props.geolocation.latitude,
+          longitude: this.props.geolocation.longitude
+        },
+        {
+          latitude: +this.props.cache.location.split("|")[0],
+          longitude: +this.props.cache.location.split("|")[1]
+        }
+      )
+    });
     this.cachesService
       .fetchCacheDetails(this.props.cache.code)
       .then(response => {
@@ -76,6 +98,7 @@ export default class Details extends Component<DetailsProps, DetailsState> {
         <p>Typ: {this.state.cache.type}</p>
         <p>Dystans: ~{Math.round(this.state.cache.distance)}m</p>
         <p>Lokacja: {this.state.cache.location.split("|").join(" ")}</p>
+        <p>Kierunek: {this.state.bearing}</p>
         <br />
         <p>Ocena: {this.state.cache.rating}/5</p>
         <p>Rekomendacje: {this.state.cache.recommendations}</p>
@@ -83,6 +106,30 @@ export default class Details extends Component<DetailsProps, DetailsState> {
         <p>Rozmiar: {this.state.cache.size2}</p>
         <p>Trudność: {this.state.cache.difficulty}/5</p>
         <p>Teren: {this.state.cache.terrain}/5</p>
+        <br />
+        <hr />
+        <hr />
+        <br />
+        <div className="Compass">
+          <div
+            className="Compass-background"
+            style={{
+              transform: `rotateZ(${360 - this.props.phoneHeading}deg)`
+            }}
+          >
+            <span className="Compass-north">N</span>
+          </div>
+          <div
+            className="Compass-cache"
+            style={{
+              transform: `rotateZ(${360 -
+                this.props.phoneHeading +
+                this.state.bearing}deg)`
+            }}
+          >
+            |
+          </div>
+        </div>
         <br />
         <hr />
         <hr />

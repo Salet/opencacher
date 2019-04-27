@@ -25,7 +25,7 @@ interface AppState {
   orientationReliable: boolean;
   orientationRelativeEvents: boolean;
   orientationAbsoluteEvents: boolean;
-  orientation: Orientation;
+  orientation: Orientation & { trueBearing: number };
 }
 
 export default class App extends Component<any, AppState> {
@@ -50,7 +50,8 @@ export default class App extends Component<any, AppState> {
         alpha: 0,
         beta: 0,
         gamma: 0,
-        webkitCompassHeading: 0
+        webkitCompassHeading: 0,
+        trueBearing: 0
       }
     };
   }
@@ -67,7 +68,7 @@ export default class App extends Component<any, AppState> {
     if (this.state.geolocationObject) {
       navigator.geolocation.getCurrentPosition(
         this.handlePositionEvent.bind(this),
-        () => { },
+        () => {},
         { enableHighAccuracy: true }
       );
     }
@@ -86,7 +87,10 @@ export default class App extends Component<any, AppState> {
         alpha: +(event.alpha || 0).toFixed(2),
         beta: +(event.beta || 0).toFixed(2),
         gamma: +(event.gamma || 0).toFixed(2),
-        webkitCompassHeading: +(event.webkitCompassHeading || 0).toFixed(2)
+        webkitCompassHeading: +(event.webkitCompassHeading || 0).toFixed(2),
+        trueBearing: (
+          (event.absolute ? event.alpha : event.webkitCompassHeading) || 0
+        ).toFixed(2)
       }
     });
   }
@@ -168,22 +172,27 @@ export default class App extends Component<any, AppState> {
           </div>
         )}
 
-        {this.state.page == "nearby" && (
-          this.state.geolocationReliable && (
+        {this.state.page == "nearby" &&
+          ((this.state.geolocationReliable && (
             <Nearby
               geolocation={this.state.geolocation}
               onCacheClick={this.handleCacheClick.bind(this)}
-            />) ||
-          !this.state.geolocationEnabled && (
-            <p>Please enable geolocation permission for your browser and this page to see nearby caches.</p>
-          ) ||
-          !this.state.geolocationObject && (
-            <p>Device not supported :(</p>
-          )
-        )}
+            />
+          )) ||
+            (!this.state.geolocationEnabled && (
+              <p>
+                Please enable geolocation permission for your browser and this
+                page to see nearby caches.
+              </p>
+            )) ||
+            (!this.state.geolocationObject && <p>Device not supported :(</p>))}
 
         {this.state.page == "details" && this.state.currentCache && (
-          <Details cache={this.state.currentCache} />
+          <Details
+            cache={this.state.currentCache}
+            geolocation={this.state.geolocation}
+            phoneHeading={this.state.orientation.trueBearing}
+          />
         )}
       </div>
     );
