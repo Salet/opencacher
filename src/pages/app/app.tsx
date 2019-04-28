@@ -66,12 +66,16 @@ export default class App extends Component<any, AppState> {
     );
 
     if (this.state.geolocationObject) {
-      navigator.geolocation.getCurrentPosition(
-        this.handlePositionEvent.bind(this),
-        () => {},
-        { enableHighAccuracy: true }
-      );
+      this.performGeolocation();
     }
+  }
+
+  performGeolocation() {
+    navigator.geolocation.getCurrentPosition(
+      this.handlePositionEvent.bind(this),
+      () => {},
+      { enableHighAccuracy: true }
+    );
   }
 
   handleOrientationEvent(event: any) {
@@ -191,7 +195,8 @@ export default class App extends Component<any, AppState> {
           <Details
             cache={this.state.currentCache}
             geolocation={this.state.geolocation}
-            phoneHeading={this.state.orientation.trueBearing}
+            heading={this.state.orientation.trueBearing}
+            onRefreshGeolocation={this.performGeolocation.bind(this)}
           />
         )}
       </div>

@@ -15,12 +15,14 @@ import "./details.css";
 interface DetailsProps {
   cache: CacheDetailsWithDistance;
   geolocation: Geolocation;
-  phoneHeading: number;
+  heading: number;
+  onRefreshGeolocation: Function;
 }
 
 interface DetailsState {
   cache: CacheDetailsExtended;
   bearing: number;
+  distance: number;
 }
 
 const EMPTY_CACHE = {
@@ -41,29 +43,22 @@ const EMPTY_CACHE = {
 
 export default class Details extends Component<DetailsProps, DetailsState> {
   cachesService = new CachesService();
+  interval: any;
 
   constructor(props: DetailsProps) {
     super(props);
     this.state = {
-      cache: EMPTY_CACHE,
-      bearing: 0
+      cache: { ...EMPTY_CACHE, ...props.cache },
+      bearing: 0,
+      distance: 0
     };
+
+    this.interval = setInterval(() => {
+      this.props.onRefreshGeolocation();
+    }, 300);
   }
 
-  componentWillMount() {
-    this.setState({
-      cache: { ...EMPTY_CACHE, ...this.props.cache },
-      bearing: calculateGeoPointDegreeBearing(
-        {
-          latitude: this.props.geolocation.latitude,
-          longitude: this.props.geolocation.longitude
-        },
-        {
-          latitude: +this.props.cache.location.split("|")[0],
-          longitude: +this.props.cache.location.split("|")[1]
-        }
-      )
-    });
+  componentDidMount() {
     this.cachesService
       .fetchCacheDetails(this.props.cache.code)
       .then(response => {
@@ -73,6 +68,40 @@ export default class Details extends Component<DetailsProps, DetailsState> {
         };
         this.setState({ cache: extendedCache });
       });
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  componentDidUpdate(prevProps: DetailsProps) {
+    if (
+      this.props.geolocation.latitude !== prevProps.geolocation.latitude ||
+      this.props.geolocation.longitude !== prevProps.geolocation.longitude
+    ) {
+      this.setState({
+        bearing: calculateGeoPointDegreeBearing(
+          {
+            latitude: this.props.geolocation.latitude,
+            longitude: this.props.geolocation.longitude
+          },
+          {
+            latitude: +this.props.cache.location.split("|")[0],
+            longitude: +this.props.cache.location.split("|")[1]
+          }
+        ),
+        distance: calculateGeoPointMeterDistance(
+          {
+            latitude: this.props.geolocation.latitude,
+            longitude: this.props.geolocation.longitude
+          },
+          {
+            latitude: +this.props.cache.location.split("|")[0],
+            longitude: +this.props.cache.location.split("|")[1]
+          }
+        )
+      });
+    }
   }
 
   renderLog(log: CacheLog) {
@@ -94,18 +123,30 @@ export default class Details extends Component<DetailsProps, DetailsState> {
         <h3>{this.state.cache.name}</h3>
         <h5>{this.state.cache.code}</h5>
         <br />
-        <p>Status: {this.state.cache.status}</p>
-        <p>Typ: {this.state.cache.type}</p>
-        <p>Dystans: ~{Math.round(this.state.cache.distance)}m</p>
-        <p>Lokacja: {this.state.cache.location.split("|").join(" ")}</p>
-        <p>Kierunek: {this.state.bearing}</p>
-        <br />
-        <p>Ocena: {this.state.cache.rating}/5</p>
-        <p>Rekomendacje: {this.state.cache.recommendations}</p>
-        <br />
-        <p>Rozmiar: {this.state.cache.size2}</p>
-        <p>Trudność: {this.state.cache.difficulty}/5</p>
-        <p>Teren: {this.state.cache.terrain}/5</p>
+        <p>
+          <b>Status:</b> {this.state.cache.status}
+        </p>
+        <p>
+          <b>Typ:</b> {this.state.cache.type}
+        </p>
+        <p>
+          <b>Ocena:</b> {this.state.cache.rating}/5
+        </p>
+        <p>
+          <b>Rekomendacje:</b> {this.state.cache.recommendations}
+        </p>
+        <p>
+          <b>Rozmiar:</b> {this.state.cache.size2}
+        </p>
+        <p>
+          <b>Trudność:</b> {this.state.cache.difficulty}/5
+        </p>
+        <p>
+          <b>Teren:</b> {this.state.cache.terrain}/5
+        </p>
+        <p>
+          <b>GPS:</b> {this.state.cache.location.split("|").join(" ")}
+        </p>
         <br />
         <hr />
         <hr />
@@ -114,7 +155,7 @@ export default class Details extends Component<DetailsProps, DetailsState> {
           <div
             className="Compass-background"
             style={{
-              transform: `rotateZ(${360 - this.props.phoneHeading}deg)`
+              transform: `rotateZ(${360 - this.props.heading}deg)`
             }}
           >
             <span className="Compass-north">N</span>
@@ -123,11 +164,17 @@ export default class Details extends Component<DetailsProps, DetailsState> {
             className="Compass-cache"
             style={{
               transform: `rotateZ(${360 -
-                this.props.phoneHeading +
+                this.props.heading +
                 this.state.bearing}deg)`
             }}
           >
             |
+          </div>
+          <div className="Compass-front">
+            <br />|
+          </div>
+          <div className="Compass-distance">
+            {this.state.distance.toFixed(2)}m
           </div>
         </div>
         <br />

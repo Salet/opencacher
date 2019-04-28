@@ -1,20 +1,57 @@
 .Compass {
-  height: 200px;
+  margin: 0 auto;
+  max-width: 400px;
+  overflow: hidden;
   position: relative;
   text-align: center;
+  width: 90%;
+}
+
+.Compass:before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+.Compass-north {
+  position: relative;
+  top: -25px;
+}
+
+.Compass-background,
+.Compass-cache,
+.Compass-distance,
+.Compass-front {
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  top: 20px;
+  position: absolute;
 }
 
 .Compass-background {
-  border-radius: 200px;
+  border-radius: 100%;
   border: 3px solid black;
-  height: 200px;
-  position: absolute;
-  width: 200px;
 }
 
 .Compass-cache {
   color: red;
-  height: 200px;
-  position: absolute;
-  width: 200px;
+}
+
+.Compass-cache,
+.Compass-front {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.Compass-distance {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.Compass-distance:before {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
 }

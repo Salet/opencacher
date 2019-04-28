@@ -16,6 +16,11 @@ export interface CacheDetailsWithDistance extends CacheDetails {
   distance: number;
 }
 
+export interface CacheDetailsExtended extends CacheDetailsWithDistance {
+  description: string;
+  latest_logs: Array<CacheLog>;
+}
+
 export interface CacheLog {
   uuid: string;
   date: string;
@@ -26,9 +31,4 @@ export interface CacheLog {
     username: string;
     profile_url: string;
   };
-}
-
-export interface CacheDetailsExtended extends CacheDetailsWithDistance {
-  description: string;
-  latest_logs: Array<CacheLog>;
 }
