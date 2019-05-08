@@ -1,15 +1,9 @@
 import React, { Component } from "react";
-import {
-  CacheDetailsWithDistance,
-  CacheDetailsExtended,
-  CacheLog
-} from "../../interfaces/caches";
+import { CacheDetailsWithDistance, CacheDetailsExtended, CacheLog } from "../../interfaces/caches";
 import CachesService from "../../services/caches";
-import {
-  calculateGeoPointMeterDistance,
-  calculateGeoPointDegreeBearing
-} from "../../helpers/geolocation";
+import { calculateGeoPointMeterDistance, calculateGeoPointDegreeBearing } from "../../helpers/geolocation";
 import { Geolocation } from "../../interfaces/geolocation";
+import CompassComponent from "../../components/compass/compass";
 import "./details.css";
 
 interface DetailsProps {
@@ -23,6 +17,7 @@ interface DetailsState {
   cache: CacheDetailsExtended;
   bearing: number;
   distance: number;
+  tab: Tabs;
 }
 
 const EMPTY_CACHE = {
@@ -41,6 +36,8 @@ const EMPTY_CACHE = {
   latest_logs: []
 };
 
+type Tabs = "description" | "logs" | "compass" | "photos";
+
 export default class Details extends Component<DetailsProps, DetailsState> {
   cachesService = new CachesService();
   interval: any;
@@ -50,7 +47,8 @@ export default class Details extends Component<DetailsProps, DetailsState> {
     this.state = {
       cache: { ...EMPTY_CACHE, ...props.cache },
       bearing: 0,
-      distance: 0
+      distance: 0,
+      tab: "description"
     };
 
     this.interval = setInterval(() => {
@@ -59,15 +57,13 @@ export default class Details extends Component<DetailsProps, DetailsState> {
   }
 
   componentDidMount() {
-    this.cachesService
-      .fetchCacheDetails(this.props.cache.code)
-      .then(response => {
-        let extendedCache: CacheDetailsExtended = {
-          ...this.state.cache,
-          ...response
-        };
-        this.setState({ cache: extendedCache });
-      });
+    this.cachesService.fetchCacheDetails(this.props.cache.code).then(response => {
+      let extendedCache: CacheDetailsExtended = {
+        ...this.state.cache,
+        ...response
+      };
+      this.setState({ cache: extendedCache });
+    });
   }
 
   componentWillUnmount() {
@@ -117,6 +113,45 @@ export default class Details extends Component<DetailsProps, DetailsState> {
     );
   }
 
+  switchTab(tab: Tabs) {
+    this.setState({ tab });
+  }
+
+  renderCompass() {
+    return (
+      <div className="Compass">
+        <div className="Compass-background" style={{ transform: `rotateZ(${360 - this.props.heading}deg)` }}>
+          <span className="Compass-north">N</span>
+        </div>
+        <div
+          className="Compass-cache"
+          style={{
+            transform: `rotateZ(${360 - this.props.heading + this.state.bearing}deg)`
+          }}
+        >
+          |
+        </div>
+        <div className="Compass-front">
+          <br />|
+        </div>
+        <div className="Compass-distance">{this.state.distance.toFixed(2)}m</div>
+      </div>
+    );
+  }
+
+  renderTab() {
+    switch (this.state.tab) {
+      case "description":
+        return <div dangerouslySetInnerHTML={{ __html: this.state.cache.description }} />;
+      case "logs":
+        return <div>{this.state.cache.latest_logs.map(this.renderLog)}</div>;
+      case "compass":
+        return (
+          <CompassComponent heading={this.props.heading} bearing={this.state.bearing} distance={this.state.distance} />
+        );
+    }
+  }
+
   render() {
     return (
       <div>
@@ -147,48 +182,33 @@ export default class Details extends Component<DetailsProps, DetailsState> {
         <p>
           <b>GPS:</b> {this.state.cache.location.split("|").join(" ")}
         </p>
-        <br />
-        <hr />
-        <hr />
-        <br />
-        <div className="Compass">
-          <div
-            className="Compass-background"
-            style={{
-              transform: `rotateZ(${360 - this.props.heading}deg)`
-            }}
+        <ul className="Tabs">
+          <li
+            className={`Tabs-single ${this.state.tab == "description" ? "Tabs-single--active" : ""}`}
+            onClick={_ => this.switchTab("description")}
           >
-            <span className="Compass-north">N</span>
-          </div>
-          <div
-            className="Compass-cache"
-            style={{
-              transform: `rotateZ(${360 -
-                this.props.heading +
-                this.state.bearing}deg)`
-            }}
+            Opis
+          </li>
+          <li
+            className={`Tabs-single ${this.state.tab == "logs" ? "Tabs-single--active" : ""}`}
+            onClick={_ => this.switchTab("logs")}
           >
-            |
-          </div>
-          <div className="Compass-front">
-            <br />|
-          </div>
-          <div className="Compass-distance">
-            {this.state.distance.toFixed(2)}m
-          </div>
-        </div>
-        <br />
-        <hr />
-        <hr />
-        <br />
-        <div
-          dangerouslySetInnerHTML={{ __html: this.state.cache.description }}
-        />
-        <br />
-        <hr />
-        <hr />
-        <br />
-        {this.state.cache.latest_logs.map(this.renderLog)}
+            Logi
+          </li>
+          <li
+            className={`Tabs-single ${this.state.tab == "compass" ? "Tabs-single--active" : ""}`}
+            onClick={_ => this.switchTab("compass")}
+          >
+            Kompas
+          </li>
+          <li
+            className={`Tabs-single ${this.state.tab == "photos" ? "Tabs-single--active" : ""}`}
+            onClick={_ => this.switchTab("photos")}
+          >
+            Zdjęcia
+          </li>
+        </ul>
+        {this.renderTab()}
       </div>
     );
   }

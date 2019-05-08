@@ -1,57 +1,16 @@
-.Compass {
-  margin: 0 auto;
-  max-width: 400px;
-  overflow: hidden;
-  position: relative;
-  text-align: center;
-  width: 90%;
+.Tabs {
+  margin: 20px 0;
 }
 
-.Compass:before {
-  content: "";
-  display: block;
-  padding-top: 100%;
-}
-
-.Compass-north {
-  position: relative;
-  top: -25px;
-}
-
-.Compass-background,
-.Compass-cache,
-.Compass-distance,
-.Compass-front {
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-  top: 20px;
-  position: absolute;
-}
-
-.Compass-background {
-  border-radius: 100%;
-  border: 3px solid black;
-}
-
-.Compass-cache {
-  color: red;
-}
-
-.Compass-cache,
-.Compass-front {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.Compass-distance {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.Compass-distance:before {
-  content: "";
+.Tabs-single {
+  cursor: pointer;
   display: inline-block;
-  height: 100%;
-  vertical-align: middle;
+  margin-right: 15px;
+  margin-left: -2px;
+  padding: 2px;
+}
+
+.Tabs-single--active {
+  border-bottom: 2px solid black;
+  font-weight: bold;
 }
